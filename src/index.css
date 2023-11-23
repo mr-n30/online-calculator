@@ -1,0 +1,76 @@
+body, html {
+	box-sizing: border-box;
+	height: 100%;
+	width: 100%;
+}
+
+h1 {
+	height: 100%;
+	border-bottom: 1px solid;
+}
+
+/* React:root */
+#root {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.calc-box {
+	max-width: 700px;
+	width: 100%;
+	display: grid;
+	grid-template-rows: repeat(5, 1fr);
+	grid-template-columns: 1fr 1fr;
+	gap: .2rem;
+	padding: 1rem;
+}
+
+/* Buttons 0-9 */
+.calc {
+	max-width: 500px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(5, 1fr);
+	gap: .2rem;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+/* Math buttons */
+.math-buttons-box {
+	display: grid;
+	gap: .2rem;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+/* AC Button */
+.btn-eq {
+	grid-column: 1 / span 2;
+	max-height: 100px;
+}
+
+/* Number displayed at the top */
+input {
+	text-align: right;
+	font-size: 5.0rem;
+	grid-column: 1 / span 2;
+	padding: 0px;
+	margin-bottom: .5rem;
+}
+
+/* Tape */
+footer {
+	grid-column: 1 / span 2;
+	grid-row: 4 / span 7;
+	align-self: center;
+	text-align: center;
+	padding: 2rem;
+}
+
+.tape {
+	margin-left: .2rem;
+	margin-right: .2rem;
+}
