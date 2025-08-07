@@ -66,7 +66,7 @@ const ActionButtonRow = ({ setInput }) => {
         return 'Enter a number'
       }
 
-      return prev.slice(0, -1) || '0'
+      return String(prev).slice(0, -1) || '0'
     })
   }
 
@@ -95,6 +95,7 @@ const Calculator = () => {
       <Screen input={input} />
       <ActionButtonRow setInput={setInput} />
       <NumberContainer setInput={setInput} />
+      <p className='text-sm'> &copy; Created by <a target='_blank' href="https://github.com/mr-n30">@mr-n30</a> on GitHub.</p>
     </div>
   )
 }
