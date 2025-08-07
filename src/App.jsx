@@ -1,90 +1,104 @@
-import { useState } from 'react'
-import stringMath from 'string-math'
+import { useState, useRef } from 'react'
+import { evaluate } from 'mathjs';
+import './index.css'
+import soundFile from './assets/audio/button-click-sound.wav'
 
+const NumberContainer = ({ setInput }) => {
+  const numbers = [1, 2, 3, '.', 4, 5, 6, '/', 7, 8, 9, '+', '-', 0, '*', '=']
 
-// CSS classes for the button elements
-const BUTTONCLASS = "shadow btn-lg btn border border-black";
+  const handleClick = (num) => {
+    const audio = new Audio(soundFile);
+    audio.play();
 
-                                           
-export default function App() {            
-  const [input, setInput] = useState("0");
+    setInput((prev) => {
+      if (prev === 'Enter a number' || prev === '0') {
+        return num.toString()
+      } else if (num === '=') {
+        try {
+          return evaluate(prev)
+        } catch (e) {
+          console.error(e)
+          return 'NaN'
+        }
+      } else if (num === 'delete') {
+        return prev.slice(0, -1) || '0'
+      }
 
-  // Function used to generate buttons 0-9
-  function genButtonNums() {
-    // Styles for the buttons
-    const styles = {}
-
-    const numArr = [];
-    for (let i = 1; i < 10; i++) {
-      numArr.push(i);
-    }
-
-    // Return an array of <button> elements
-    return numArr.map(buttonNum => (
-      <button
-        onClick={(e) => setInput(input + e.target.textContent)}
-        key={`buttonKey-${buttonNum}`}
-        style={styles}
-        className={BUTTONCLASS + " btn-primary"}>{buttonNum}
-      </button>
-    ))
+      return prev + num.toString()
+    })
   }
 
+  const jsx = numbers.map((num, i) => {
+    if (num === '=') {
+      return (
+        <button id={`button-${i}`} key={num} className="number-button bg-blue-500 text-white" onClick={() => handleClick(num)}>
+          {num}
+        </button>
+      )
+    }
+
+    return (
+      <button id={`button-${i}`} key={num} className="number-button bg-gray-100" onClick={() => handleClick(num)}>
+        {num}
+      </button>
+    )
+  })
+
   return (
-      <div className="border border-black border-4 rounded calc-box bg-dark bg-gradient">
-
-        {/* User input field / numbers displayed */}
-        <input 
-          className="border border-black border-4 border-rounded"
-          type="text" 
-          value={input}
-          onChange={(input) => setInput(input.target.value)}
-          autoFocus={true}/>
-
-        <div className="container-fluid calc">
-        {/* Buttons 0-9 */}
-        {genButtonNums()}
-        
-        {/* 0 and speclial symbols */}
-        <button
-          onClick={(e) => setInput(input + e.target.textContent)}
-          className={BUTTONCLASS + " btn-primary"}>0</button>
-        {/* CLEAR */}
-        <button
-          onClick={() => setInput("")}
-          className={BUTTONCLASS + " btn-danger"}>AC</button>
-        <button
-          onClick={(e) => setInput(input + e.target.textContent)}
-          className={BUTTONCLASS + " btn-secondary"}>.</button>
-
-
-        {/* Other speacial symbols */}
-        <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-secondary"}>(</button>
-        <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-secondary"}>)</button>
-        <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-secondary"}>%</button>
-        </div>
-
-        {/* Math Buttons */}
-        <div className="math-buttons-box container">
-          <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-dark btn-outline-warning"}>+</button>
-          <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-dark btn-outline-warning"}>-</button>
-          <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-dark btn-outline-warning"}>/</button>
-          <button onClick={(e) => setInput(input + e.target.textContent)} className={BUTTONCLASS + " btn-dark btn-outline-warning"}>*</button>
-        </div>
-
-        {/* Sum */}
-        <button onClick={() => {
-            try {
-              return setInput(stringMath(input));
-            } catch(SyntaxError) {
-              return setInput("Inavlid syntax");
-            }
-          }}
-          className={BUTTONCLASS + " btn-warning btn-eq"}>=</button>
-
-        {/* Footer */}
-        <footer className="text-warning border border-black border-4 bg-dark rounded rounded-5 tape">&copy;Created by: <a href="#">mr-n30</a>. Source code on <a href="#">GitHub</a></footer>
-      </div>
+    <div className="number-button-container">
+      {jsx}
+    </div>
   )
 }
 
+const ActionButtonRow = ({ setInput }) => {
+  const audio = new Audio(soundFile);
+
+  const handleClear = () => {
+    setInput('Enter a number')
+    audio.play();
+  }
+
+  const handleDelete = () => {
+    audio.play();
+    setInput((prev) => {
+      if (prev === 'Enter a number' || prev === '0' || prev === 'NaN') {
+        return 'Enter a number'
+      }
+
+      return prev.slice(0, -1) || '0'
+    })
+  }
+
+  return (
+    <div className="action-button-row">
+      <button className="delete-button" onClick={handleDelete}>DELETE</button> {/* TODO: implement delete */}
+      <button className="clear-button" onClick={handleClear}>CLEAR</button>
+    </div>
+  )
+}
+
+const Screen = ({ input }) => {
+  console.log(input)
+  return (
+    <div className="screen">
+      {input}
+    </div>
+  )
+}
+
+const Calculator = () => {
+  const [input, setInput] = useState('Enter a number')
+
+  return (
+    <div className="calculator">
+      <Screen input={input} />
+      <ActionButtonRow setInput={setInput} />
+      <NumberContainer setInput={setInput} />
+    </div>
+  )
+}
+
+export default function App() {
+  return <Calculator />
+}
