@@ -2,29 +2,45 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { useState } from 'react'
-
+import { evaluate } from 'mathjs';
 
 const NumberContainer = ({ setInput }) => {
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '.', '=', '+', '-', '*', '/']
+  const numbers = [1, 2, 3, '.', 4, 5, 6, '/', 7, 8, 9, '+', '-', 0, '*', '=']
 
   const handleClick = (num) => {
     setInput((prev) => {
-      // TODO: make this a switch statement
-      if (prev === 'Enter a number') {
-        return String(num)
-      } else if (prev === '0' || prev === '=') { // TODO: add remaining operators
-        return String(num)
+      if (prev === 'Enter a number' || prev === '0') {
+        return num.toString()
+      } else if (num === '=') {
+        try {
+          return evaluate(prev)
+        } catch (e) {
+          console.error(e)
+          return 'NaN'
+        }
+      } else if (num === 'delete') {
+        return prev.slice(0, -1) || '0'
       }
 
-      return prev + String(num)
+      return prev + num.toString()
     })
   }
 
-  const jsx = numbers.map((num) => (
-    <button key={num} className="number-button bg-gray-100" onClick={() => handleClick(num)}>
-      {num}
-    </button>
-  ))
+  const jsx = numbers.map((num, i) => {
+    if (num === '=') {
+      return (
+        <button id={`button-${i}`} key={num} className="number-button bg-blue-500 text-white" onClick={() => handleClick(num)}>
+          {num}
+        </button>
+      )
+    }
+
+    return (
+      <button id={`button-${i}`} key={num} className="number-button bg-gray-100" onClick={() => handleClick(num)}>
+        {num}
+      </button>
+    )
+  })
 
   return (
     <div className="number-button-container">
@@ -35,13 +51,23 @@ const NumberContainer = ({ setInput }) => {
 
 const ActionButtonRow = ({ setInput }) => {
   const handleClear = () => {
-    setInput('0')
+    setInput('Enter a number')
+  }
+
+  const handleDelete = () => {
+    setInput((prev) => {
+      if (prev === 'Enter a number' || prev === '0' || prev === 'NaN') {
+        return 'Enter a number'
+      }
+
+      return prev.slice(0, -1) || '0'
+    })
   }
 
   return (
     <div className="action-button-row">
+      <button className="delete-button" onClick={handleDelete}>DELETE</button> {/* TODO: implement delete */}
       <button className="clear-button" onClick={handleClear}>CLEAR</button>
-      <button className="delete-button">DELETE</button>
     </div>
   )
 }
